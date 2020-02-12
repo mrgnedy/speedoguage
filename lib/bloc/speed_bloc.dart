@@ -14,6 +14,7 @@ class SpeedBloc {
   Stream<double> get speedStream  => speedStreamController.stream;
   SpeedBloc.init(){
     _locationRepo.speedStream.listen((postion){
+      
       if(postion==null)
       print('isNull');
       print(geoStatus);
@@ -21,6 +22,7 @@ class SpeedBloc {
       print(postion.speed);
     });
     _locationRepo.geoStatusStream.listen((status){
+
       geoStatus = status;
       print(geoStatus);
     });
