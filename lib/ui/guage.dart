@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutt_guage/main.dart';
+import 'package:flutt_guage/ui/guage_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
@@ -17,84 +18,23 @@ class _SpeedoGuageState extends State<SpeedoGuage> {
     return Scaffold(
       backgroundColor: Colors.blueGrey[900],
       body: Center(
-        child: Container(
-          // height: 200,
-          // width: 200,
-          child: StreamBuilder<double>(
-              initialData: 0,
-              stream: speedBloc.speedStream,
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  print('object');
-                }
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Container(),
-                    Container(
-                      width: 250,
-                      height:250,
-                      child: buildGuage(snapshot.data)),
-                    Container(),
-                  ],
-                );
-              }),
-          // child: SpeedoGuage()
-        ),
+        child: StreamBuilder<double>(
+            initialData: 0,
+            stream: speedBloc.speedStream,
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                print('object');
+              }
+              return Container(
+                  width: 250, height: 250, child: Guage(speed: snapshot.data));
+            }),
+        // child: SpeedoGuage()
       ),
     );
   }
 }
 
-Widget buildGuage(double speed) {
-  return SfRadialGauge(
-    enableLoadingAnimation: true,
-    animationDuration: 3000,
-    axes: <RadialAxis>[
-      RadialAxis(
-        minimum: 0,
-        maximum: 15,
-        ranges: [
-          GaugeRange(startValue: 0, endValue: 5, color: Colors.green),
-          GaugeRange(startValue: 5, endValue: 10, color: Colors.yellow),
-          GaugeRange(startValue: 10, endValue: 15, color: Colors.red),
-        ],
-        annotations: [
-          GaugeAnnotation(
-              widget: Text(
-                '${speed.toStringAsFixed(3)}m/s',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold),
-              ),
-              positionFactor: 0.7,
-              angle: 90)
-        ],
-        pointers: [
-          NeedlePointer(
-            knobStyle: KnobStyle(
-              color: Colors.green,
-              borderColor: Colors.red,
-              borderWidth: 0.05,
-            ),
-            animationDuration: 3000,
-            animationType: AnimationType.easeInCirc,
-            needleColor: Colors.yellow,
-            gradient: LinearGradient(colors: [
-              Colors.green,
-              Colors.yellow,
-              Colors.red,
-            ]),
-            value: speed,
-          ),
-        ],
-        useRangeColorForAxis: true,
-      )
-    ],
-  );
-}
-
+/// DEPRECATED
 class _Guage extends CustomPainter {
   final Offset offset;
 
