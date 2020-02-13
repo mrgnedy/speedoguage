@@ -21,11 +21,11 @@ class SpeedBloc {
       speedSink.add(postion. speed);
       print(postion.speed);
     });
-    _locationRepo.geoStatusStream.listen((status){
+    // _locationRepo.geoStatusStream.listen((status){
 
-      geoStatus = status;
-      print(geoStatus);
-    });
+    //   geoStatus = status;
+    //   print(geoStatus);
+    // });
     
   }
 
