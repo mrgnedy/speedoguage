@@ -34,7 +34,7 @@ class Guage extends StatelessWidget {
   GaugeAnnotation buildGaugeAnnotation() {
     return GaugeAnnotation(
         widget: Text(
-          '${speed.toStringAsFixed(3)}m/s',
+          '${speed.toStringAsFixed(3)}Kmh/h',
           style: TextStyle(
               color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
         ),

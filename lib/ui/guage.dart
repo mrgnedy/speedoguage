@@ -23,7 +23,7 @@ class _SpeedoGuageState extends State<SpeedoGuage> {
             stream: speedBloc.speedStream,
             builder: (context, snapshot) {
               if (snapshot.hasError) {
-                print('object');
+                print(snapshot.error);
               }
               return Container(
                   width: 250, height: 250, child: Guage(speed: snapshot.data));

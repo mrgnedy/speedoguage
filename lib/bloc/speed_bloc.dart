@@ -18,9 +18,13 @@ class SpeedBloc {
       if(postion==null)
       print('isNull');
       print(geoStatus);
-      speedSink.add(postion. speed);
+      speedSink.add(msToKMH(postion.speed));
       print(postion.speed);
     });
+
+    }
+    double msToKMH(double value){
+      return value *3.6;
     // _locationRepo.geoStatusStream.listen((status){
 
     //   geoStatus = status;
@@ -28,6 +32,7 @@ class SpeedBloc {
     // });
     
   }
+
 
 
 
