@@ -17,11 +17,11 @@ class Guage extends StatelessWidget {
   RadialAxis buildRadialAxis() {
     return RadialAxis(
       minimum: 0,
-      maximum: 15,
+      maximum: 60,
       ranges: [
-        GaugeRange(startValue: 0, endValue: 5, color: Colors.green),
-        GaugeRange(startValue: 5, endValue: 10, color: Colors.yellow),
-        GaugeRange(startValue: 10, endValue: 15, color: Colors.red),
+        GaugeRange(startValue: 0, endValue: 20, color: Colors.green),
+        GaugeRange(startValue: 20, endValue: 40, color: Colors.yellow),
+        GaugeRange(startValue: 40, endValue: 60, color: Colors.red),
       ],
       annotations: [buildGaugeAnnotation()],
       pointers: [
