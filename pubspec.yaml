@@ -29,6 +29,7 @@ dependencies:
   provider: any
   app_settings: any
   sensors: ^0.4.0
+  division: any
   permission_handler: any
 
 dev_dependencies:

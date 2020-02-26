@@ -1,10 +1,7 @@
-import 'dart:math';
-import 'dart:typed_data';
-
+import 'package:division/division.dart';
 import 'package:flutt_guage/main.dart';
 import 'package:flutt_guage/ui/guage_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class SpeedoGuage extends StatefulWidget {
   @override
@@ -18,20 +15,44 @@ class _SpeedoGuageState extends State<SpeedoGuage> {
     return Scaffold(
       backgroundColor: Colors.blueGrey[900],
       body: Center(
-        child: StreamBuilder<double>(
-            initialData: 0,
-            stream: speedBloc.speedStream,
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                print(snapshot.error);
-              }
-              return Container(
-                  width: 250, height: 250, child: Guage(speed: snapshot.data));
-            }),
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            Expanded(child: speedWidget()),
+            Expanded(child: accelerationWidget()),
+          ],
+        ),
         // child: SpeedoGuage()
       ),
     );
   }
+}
+
+Widget speedWidget() {
+  return StreamBuilder<double>(
+      initialData: 0,
+      stream: speedBloc.speedStream,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          print(snapshot.error);
+        }
+        return Container(
+            width: 250, height: 250, child: Guage(speed: snapshot.data));
+      });
+}
+
+Widget accelerationWidget() {
+  return StreamBuilder<double>(
+    stream: speedBloc.accelStream,
+    initialData: 0,
+    builder: (context, snapshot) => Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Txt('Acceleration Time', style: TxtStyle()..textColor(Colors.white)..fontSize(24),),
+        Txt('${snapshot.data}', style: TxtStyle()..textColor(Colors.white)..fontSize(18),)
+      ],
+    ),
+  );
 }
 
 /// DEPRECATED
