@@ -12,8 +12,8 @@ class CurrentLocationRepo {
 
   CurrentLocationRepo.init() {
     // geoStatusStream= _geolocator.checkGeolocationPermissionStatus().asStream();
-    // geoStatusStream= PermissionHandler().checkPermissionStatus(PermissionGroup.location).asStream();
-  
+    geoStatusStream= PermissionHandler().checkPermissionStatus(PermissionGroup.location).asStream();
+    
     speedStream = _geolocator.getPositionStream(
         LocationOptions(), GeolocationPermission.location);
   }

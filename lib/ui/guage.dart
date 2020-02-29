@@ -15,17 +15,38 @@ class _SpeedoGuageState extends State<SpeedoGuage> {
     return Scaffold(
       backgroundColor: Colors.blueGrey[900],
       body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
+        child: Stack(
           children: <Widget>[
-            Expanded(child: speedWidget()),
-            Expanded(child: accelerationWidget()),
+            Align(
+              alignment: Alignment(-0.9, -0.9),
+              child: gpsStatusWidget(),
+            ),
+            Column(
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Expanded(
+                    child: Align(
+                        alignment: Alignment(0, 0),
+                        child: accelerationWidget())),
+                Expanded(child: speedWidget()),
+              ],
+            ),
           ],
         ),
         // child: SpeedoGuage()
       ),
     );
   }
+}
+
+Widget gpsStatusWidget() {
+  return Container(
+    height: 20,
+    decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.green,
+        gradient: RadialGradient(colors: [Colors.greenAccent, Colors.green])),
+  );
 }
 
 Widget speedWidget() {
@@ -48,8 +69,17 @@ Widget accelerationWidget() {
     builder: (context, snapshot) => Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Txt('Acceleration Time', style: TxtStyle()..textColor(Colors.white)..fontSize(24),),
-        Txt('${snapshot.data}', style: TxtStyle()..textColor(Colors.white)..fontSize(18),)
+        Txt('Acceleration Time',
+            style: TxtStyle()
+              ..textColor(Colors.white)
+              ..fontSize(24)),
+        Txt('${snapshot.data}',
+            style: TxtStyle()
+              ..textColor(Colors.white)
+              ..fontSize(18)),
+        RaisedButton(onPressed: () {
+          speedBloc.startCalculating(true);
+        })
       ],
     ),
   );

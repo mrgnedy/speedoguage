@@ -7,18 +7,28 @@ import 'package:sensors/sensors.dart';
 
 class SpeedBloc {
   Timer time;
+
   DateTime timeStart = DateTime.now();
   DateTime timeEnd = DateTime.now();
-  int startSpeed;
-  int endSpeed;
+
+
+  bool _startCalculating = true;
+
+  bool get getCalcStatus  => _startCalculating;
+  bool startCalculating(bool b)  => _startCalculating = b;
+  // int startSpeed;
+  // int endSpeed;
 
   CurrentLocationRepo _locationRepo = CurrentLocationRepo.init();
-  StreamController<double> speedStreamController = StreamController();
-  StreamController<double> accelTimeStreamController = StreamController();
+  
+  StreamController<double> speedStreamController = StreamController.broadcast();
+  StreamController<double> accelTimeStreamController = StreamController.broadcast();
+  StreamController<PermissionStatus> geoStatusController = StreamController();
 
-  PermissionStatus geoStatus;
-  StreamController<double> geoStatusController = StreamController();
-
+  // TODO
+  // Sink<PermissionStatus> get geoStatusSink => geoStatusController.sink;
+  // Stream<PermissionStatus> get geoStatusStream => geoStatusController.stream;
+  
   Sink<double> get speedSink => speedStreamController.sink;
   Stream<double> get speedStream => speedStreamController.stream;
 
@@ -26,6 +36,10 @@ class SpeedBloc {
   Stream<double> get accelStream => accelTimeStreamController.stream;
 
   SpeedBloc.init() {
+      _locationRepo.geoStatusStream.listen((geoLocPermission){
+          //TODO
+      });
+
     _locationRepo.speedStream.listen((postion) {
       final accelTime = calculateAcc(postion.speedInKMH());
       if (accelTime >= 0) accelSink.add(accelTime);
@@ -34,12 +48,14 @@ class SpeedBloc {
     });
   }
   double calculateAcc(double x) {
-    if (x >= 10) {
-      //  time = Timer(duration, callback)
-      timeStart = DateTime.now();
-    }
-    if (x >= 30) {
-      timeEnd = DateTime.now();
+    if (_startCalculating) {
+      if (x >= 10) {
+        timeStart = DateTime.now();
+      }
+      if (x >= 30) {
+        _startCalculating = false;
+        timeEnd = DateTime.now();
+      }
     }
     final diference = timeStart.difference(timeEnd).inMilliseconds / 1000;
 
