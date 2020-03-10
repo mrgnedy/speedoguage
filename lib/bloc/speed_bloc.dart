@@ -11,24 +11,43 @@ class SpeedBloc {
   DateTime timeStart = DateTime.now();
   DateTime timeEnd = DateTime.now();
 
+  double _startSpeed;
+  double _endSpeed;
 
-  bool _startCalculating = true;
+  double _difference;
 
-  bool get getCalcStatus  => _startCalculating;
-  bool startCalculating(bool b)  => _startCalculating = b;
+  bool _detectStartSpeedTime = false;
+  bool _detectEndSpeedTime = false;
+
+  bool maxSpeedReached() =>
+      !(_detectEndSpeedTime && _detectStartSpeedTime) && _difference != 0;
+
+  bool get getCalcStatus => _detectStartSpeedTime;
+  void startCalculating(bool isCalc, double startSpeed, double endSpeed) {
+    _difference = 0.0;
+    _startSpeed = startSpeed;
+    _endSpeed = endSpeed;
+    timeStart = DateTime.now();
+    timeEnd = DateTime.now();
+    _detectEndSpeedTime = false;
+    _detectStartSpeedTime = isCalc;
+    print('Starting speed is: $startSpeed');
+    print('Finishing speed is: $endSpeed');
+  }
   // int startSpeed;
   // int endSpeed;
 
   CurrentLocationRepo _locationRepo = CurrentLocationRepo.init();
-  
+
   StreamController<double> speedStreamController = StreamController.broadcast();
-  StreamController<double> accelTimeStreamController = StreamController.broadcast();
+  StreamController<double> accelTimeStreamController =
+      StreamController.broadcast();
   StreamController<PermissionStatus> geoStatusController = StreamController();
 
   // TODO
   // Sink<PermissionStatus> get geoStatusSink => geoStatusController.sink;
   // Stream<PermissionStatus> get geoStatusStream => geoStatusController.stream;
-  
+
   Sink<double> get speedSink => speedStreamController.sink;
   Stream<double> get speedStream => speedStreamController.stream;
 
@@ -36,30 +55,36 @@ class SpeedBloc {
   Stream<double> get accelStream => accelTimeStreamController.stream;
 
   SpeedBloc.init() {
-      _locationRepo.geoStatusStream.listen((geoLocPermission){
-          //TODO
-      });
+    _locationRepo.geoStatusStream.listen((geoLocPermission) {
+      //TODO
+    });
 
     _locationRepo.speedStream.listen((postion) {
       final accelTime = calculateAcc(postion.speedInKMH());
       if (accelTime >= 0) accelSink.add(accelTime);
       speedSink.add(postion.speedInKMH());
-      print(postion.speed);
+      print(postion.speedInKMH());
     });
   }
   double calculateAcc(double x) {
-    if (_startCalculating) {
-      if (x >= 10) {
+    if (_detectStartSpeedTime) {
+      if (x >= _startSpeed) {
         timeStart = DateTime.now();
-      }
-      if (x >= 30) {
-        _startCalculating = false;
-        timeEnd = DateTime.now();
+        _detectStartSpeedTime = false;
+        _detectEndSpeedTime = true;
       }
     }
-    final diference = timeStart.difference(timeEnd).inMilliseconds / 1000;
+    if (_detectEndSpeedTime) {
+      if (x >= _endSpeed) {
+        timeEnd = DateTime.now();
+        _detectEndSpeedTime = false;
+      }
+    }
+    _difference = 0.0;
+    if (!(_detectEndSpeedTime && _detectStartSpeedTime))
+      _difference = timeStart.difference(timeEnd).inMilliseconds / 1000;
 
-    return diference;
+    return _difference;
   }
 
   double msToKMH(double value) {

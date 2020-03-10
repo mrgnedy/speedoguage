@@ -62,6 +62,8 @@ Widget speedWidget() {
       });
 }
 
+TextEditingController startSpeedCtrler = TextEditingController();
+TextEditingController endSpeedCtrler = TextEditingController();
 Widget accelerationWidget() {
   return StreamBuilder<double>(
     stream: speedBloc.accelStream,
@@ -77,10 +79,79 @@ Widget accelerationWidget() {
             style: TxtStyle()
               ..textColor(Colors.white)
               ..fontSize(18)),
-        RaisedButton(onPressed: () {
-          speedBloc.startCalculating(true);
-        })
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Txt(
+                  'End',
+                  style: TxtStyle()..textColor(Colors.white),
+                ),
+                speedTextField(endSpeedCtrler),
+              ],
+            ),
+            RaisedButton(
+            child: Txt('Start'),
+             
+              onPressed: () {
+              speedBloc.startCalculating(
+                  true,
+                  double.parse(startSpeedCtrler.text),
+                  double.parse(endSpeedCtrler.text));
+            }),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Txt(
+                  'Start',
+                  style: TxtStyle()..textColor(Colors.white),
+                ),
+                speedTextField(startSpeedCtrler),
+              ],
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 20,
+        ),
+        Visibility(
+            visible: speedBloc.maxSpeedReached(),
+            child: Txt(
+              'Max Speed Reached',
+              style: TxtStyle()
+                ..textColor(Colors.white)
+                ..alignment.center()
+                ..alignmentContent.center()
+                ..fontSize(22),
+            ))
       ],
+    ),
+  );
+}
+
+Widget speedTextField(TextEditingController speedCtrlre) {
+  return Container(
+    width: 60,
+    child: TextField(
+      controller: speedCtrlre,
+      keyboardType: TextInputType.number,
+      textAlign: TextAlign.center,
+      decoration: InputDecoration(
+        filled: true,
+        hintText: '0.0',
+        enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.red)),
+        focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.red)),
+        fillColor: Colors.blueGrey[100],
+      ),
+      style: TextStyle(color: Colors.black),
     ),
   );
 }
