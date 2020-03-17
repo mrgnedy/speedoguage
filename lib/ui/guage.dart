@@ -121,7 +121,7 @@ Widget accelerationWidget() {
         Visibility(
             visible: speedBloc.maxSpeedReached(),
             child: Txt(
-              'Max Speed Reached ${speedBloc.maxSpeed}',
+              '${speedBloc.isReversed? 'Min' : 'Max'} Speed Reached: ${speedBloc.maxSpeed}',
               style: TxtStyle()
                 ..textColor(Colors.white)
                 ..alignment.center()

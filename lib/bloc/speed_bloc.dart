@@ -21,6 +21,7 @@ class SpeedBloc {
   bool _detectStartSpeedTime = false;
   bool _detectEndSpeedTime = false;
   bool _isReversed = false;
+  bool get isReversed => _isReversed;
 
   bool maxSpeedReached() =>
       !(_detectEndSpeedTime || _detectStartSpeedTime) && _difference != 0;
@@ -29,15 +30,9 @@ class SpeedBloc {
   void startCalculating(bool isCalc, double startSpeed, double endSpeed) {
     _difference = 0.0;
     accelSink.add(0);
-    if (startSpeed > endSpeed) {
-      _startSpeed = endSpeed;
-      _endSpeed = startSpeed;
-      _isReversed = true;
-    } else {
-      _startSpeed = startSpeed;
-      _endSpeed = endSpeed;
-      _isReversed = false;
-    }
+    _isReversed = (startSpeed > endSpeed);
+    _startSpeed = startSpeed;
+    _endSpeed = endSpeed;
     timeStart = DateTime.now();
     timeEnd = DateTime.now();
     _detectEndSpeedTime = false;
@@ -79,20 +74,41 @@ class SpeedBloc {
     });
   }
   double calculateAcc(double x) {
-    if (_detectStartSpeedTime) {
-      if (x >= _startSpeed) {
-        timeStart = DateTime.now();
-        print('Starting time $timeStart == $x');
-        _detectStartSpeedTime = false;
-        _detectEndSpeedTime = true;
+    if (!_isReversed) {
+      if (_detectStartSpeedTime) {
+        if (x >= _startSpeed) {
+          // if (_isReversed) _maxSpeed = x;
+          timeStart = DateTime.now();
+          print('Starting time $timeStart == $x');
+          _detectStartSpeedTime = false;
+          _detectEndSpeedTime = true;
+        }
       }
-    }
-    if (_detectEndSpeedTime) {
-      if (x >= _endSpeed) {
-        _maxSpeed = x;
-        timeEnd = DateTime.now();
-        print('Ending time $timeEnd == $x');
-        _detectEndSpeedTime = false;
+      if (_detectEndSpeedTime) {
+        if (x >= _endSpeed) {
+          _maxSpeed = x;
+          timeEnd = DateTime.now();
+          print('Ending time $timeEnd == $x');
+          _detectEndSpeedTime = false;
+        }
+      }
+    } else {
+      if (_detectStartSpeedTime) {
+        if (x <= _startSpeed) {
+          timeStart = DateTime.now();
+          print('Starting time $timeStart == $x');
+          _detectStartSpeedTime = false;
+          _detectEndSpeedTime = true;
+        }
+      }
+      if (_detectEndSpeedTime) {
+        if (x <= _endSpeed) {
+          _maxSpeed = x;
+          // if (!_isReversed) _maxSpeed = x;
+          timeEnd = DateTime.now();
+          print('Ending time $timeEnd == $x');
+          _detectEndSpeedTime = false;
+        }
       }
     }
     _difference = 0.0;
