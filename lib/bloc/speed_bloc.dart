@@ -13,20 +13,31 @@ class SpeedBloc {
 
   double _startSpeed;
   double _endSpeed;
-
   double _difference;
+
+  double _maxSpeed = 0;
+  String get maxSpeed => _maxSpeed.toStringAsPrecision(3);
 
   bool _detectStartSpeedTime = false;
   bool _detectEndSpeedTime = false;
+  bool _isReversed = false;
 
   bool maxSpeedReached() =>
-      !(_detectEndSpeedTime && _detectStartSpeedTime) && _difference != 0;
+      !(_detectEndSpeedTime || _detectStartSpeedTime) && _difference != 0;
 
   bool get getCalcStatus => _detectStartSpeedTime;
   void startCalculating(bool isCalc, double startSpeed, double endSpeed) {
     _difference = 0.0;
-    _startSpeed = startSpeed;
-    _endSpeed = endSpeed;
+    accelSink.add(0);
+    if (startSpeed > endSpeed) {
+      _startSpeed = endSpeed;
+      _endSpeed = startSpeed;
+      _isReversed = true;
+    } else {
+      _startSpeed = startSpeed;
+      _endSpeed = endSpeed;
+      _isReversed = false;
+    }
     timeStart = DateTime.now();
     timeEnd = DateTime.now();
     _detectEndSpeedTime = false;
@@ -61,7 +72,8 @@ class SpeedBloc {
 
     _locationRepo.speedStream.listen((postion) {
       final accelTime = calculateAcc(postion.speedInKMH());
-      if (accelTime >= 0) accelSink.add(accelTime);
+      print('AccelTime is: $accelTime');
+      if (accelTime != 0) accelSink.add(accelTime);
       speedSink.add(postion.speedInKMH());
       print(postion.speedInKMH());
     });
@@ -70,19 +82,25 @@ class SpeedBloc {
     if (_detectStartSpeedTime) {
       if (x >= _startSpeed) {
         timeStart = DateTime.now();
+        print('Starting time $timeStart == $x');
         _detectStartSpeedTime = false;
         _detectEndSpeedTime = true;
       }
     }
     if (_detectEndSpeedTime) {
       if (x >= _endSpeed) {
+        _maxSpeed = x;
         timeEnd = DateTime.now();
+        print('Ending time $timeEnd == $x');
         _detectEndSpeedTime = false;
       }
     }
     _difference = 0.0;
-    if (!(_detectEndSpeedTime && _detectStartSpeedTime))
-      _difference = timeStart.difference(timeEnd).inMilliseconds / 1000;
+    if (!(_detectEndSpeedTime || _detectStartSpeedTime)) {
+      _difference = timeEnd.difference(timeStart).inMilliseconds / 1000;
+      if (_isReversed) _difference = -_difference;
+      print('Difference is $_difference');
+    }
 
     return _difference;
   }
